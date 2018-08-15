@@ -1,27 +1,32 @@
-import arcpy
-import numpy
+import arcpy, os, numpy, shutil
 import pandas as pd
 from numpy import *
 from arcpy import env
 from arcpy.sa import *
 arcpy.CheckOutExtension("Spatial")
 
+abspath = sys.argv[0]
+dname = os.path.dirname(abspath)
+temppath = dname + "\\ztemp12345" 
+if not os.path.isdir(temppath):
+   os.makedirs(temppath)
+arcpy.env.workspace= temppath
 
 # User Specified Variables:
-arcpy.env.workspace= "C:/temp"
-Observation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/Sim1")
-Simulation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/OBS")
+Observation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/obs")
+Simulation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/sim1")
 n_classes = 2
 
 # Convert Simulation to order magnitude bigger for confusion matrix
 mod_simulation = (Raster(Simulation)+40)*100
 
 # Combine obs and sim to create confusion matrix
-matrix = mod_simulation + Raster(Observation)
-arcpy.TableToTable_conversion(matrix, 'C:/temp', 'tempOutFile.dbf')
+matrix1 = mod_simulation + Raster(Observation)
+arcpy.TableToTable_conversion(matrix1, temppath, 'tempOutFile.dbf')
 
 # Create array of data
-rows = arcpy.SearchCursor("C:/temp/tempOutFile.dbf","","","")
+location = temppath + '\\tempOutFile.dbf'
+rows = arcpy.SearchCursor(location,"","","")
 currentCOUNT = "COUNT"
 newdata = []
 for row in rows:
@@ -156,3 +161,10 @@ x = i+1
 Pontius_table.loc[x] = totals1.values
 
 print Pontius_table
+mod_simulation.save(os.path.join(temppath,'tmp_modsim'))
+arcpy.Delete_management(mod_simulation)
+matrix1.save(os.path.join(temppath,'tmp_matrix'))
+arcpy.Delete_management(matrix1)
+
+del mod_simulation, matrix1
+shutil.rmtree(temppath)
