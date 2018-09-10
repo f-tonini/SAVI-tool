@@ -1,4 +1,4 @@
-import arcpy, os, numpy, shutil
+import arcpy, os, numpy, shutil, csv, subprocess
 import pandas as pd
 from numpy import *
 from arcpy import env
@@ -13,9 +13,13 @@ if not os.path.isdir(temppath):
 arcpy.env.workspace= temppath
 
 # User Specified Variables:
-Observation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/obs")
-Simulation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/sim1")
-n_classes = 2
+Observation = ("C:\\Temp\\observed.tif")
+Simulation = ("C:\\Temp\\Simulation1.tif")
+
+# Get # of classes from raster
+n_classes = arcpy.GetRasterProperties_management(Observation, "UNIQUEVALUECOUNT")
+n_classes = n_classes.getOutput(0)
+n_classes = int(n_classes)
 
 # Convert Simulation to order magnitude bigger for confusion matrix
 mod_simulation = (Raster(Simulation)+40)*100
@@ -167,4 +171,109 @@ matrix1.save(os.path.join(temppath,'tmp_matrix'))
 arcpy.Delete_management(matrix1)
 
 del mod_simulation, matrix1
+
+### Create FRAGSTATS inputs ###
+
+
+OBSinput = str(Observation) + ",x,999,x,x,1,x"
+SIMinput = str(Simulation) + ",x,999,x,x,1,x"
+
+#Create batchfile for FRAGSTATS
+frag_csv = temppath + '\\fragbatchinput.csv'
+csv = open(frag_csv, 'w')
+csv.write(OBSinput)
+csv.write(",IDF_GeoTIFF\n")
+csv.write(SIMinput)
+csv.write(",IDF_GeoTIFF\n")
+csv.write('\n')
+csv.close()
+os.rename(frag_csv, frag_csv[:-4] + '.fbt')
+
+# Specify Frag model and execute
+model = "frag_" + str(int(n_classes)) + "class.fca"
+frag_model = dname + '\\frag_models\\' + model
+shutil.copy(frag_model, temppath)
+getEXE = dname + "\\frg.exe"
+shutil.copy(getEXE, temppath)
+results = "Result\\\\fragResult" 
+systemcall = 'frg.exe -m ' + model + ' -b fragbatchinput.fbt -o ' + results
+os.chdir(temppath)
+os.makedirs(temppath + "\\Result")
+os.system(systemcall)
+
+# Calculate FRAG results
+result = temppath + "\\Result\\fragResult.class"
+bf = pd.read_csv(result)
+outro = pd.DataFrame()
+omit = pd.DataFrame()
+i = 0
+while i < n_classes:
+    Omit_count = 0
+    Class_count = i + 1
+    try:
+        NP = abs((bf.iat[(i+n_classes),2] - bf.iat[i,2])/ bf.iat[i,2])
+    except:
+        NP = "N/A"
+        Omit_count = Omit_count + 1 
+        print "Class " + str(Class_count) + " Number of Patches omitted from calculation due to geometry."
+    try:
+        GYRATE = abs((bf.iat[(i+n_classes),3] - bf.iat[i,3])/ bf.iat[i,3])
+    except:
+        GYRATE = "N/A"
+        Omit_count = Omit_count + 1
+        print "Class " + str(Class_count) + " GYRATE_AM omitted from calculation due to geometry."
+    try:
+        FRAC = abs((bf.iat[(i+n_classes),4] - bf.iat[i,4])/ bf.iat[i,4])
+    except:
+        FRAC = "N/A"
+        Omit_count = Omit_count + 1
+        print "Class " + str(Class_count) + " FRAC_AM omitted from calculation due to geometry."
+    try:
+        CORE = abs((bf.iat[(i+n_classes),5] - bf.iat[i,5])/ bf.iat[i,5])
+    except:
+        CORE = "N/A"
+        Omit_count = Omit_count + 1
+        print "Class " + str(Class_count) + " CORE_AM omitted from calculation due to geometry."
+    try:
+        ENN_AM = abs((bf.iat[(i+n_classes),6] - bf.iat[i,6])/ bf.iat[i,6])
+    except:
+        ENN_AM = "N/A"
+        Omit_count = Omit_count + 1
+        print "Class " + str(Class_count) + " ENN_AM omitted from calculation due to geometry."
+    try:
+        ENN_CV = abs(bf.iat[(i+n_classes),7] - bf.iat[i,7])
+    except:
+        ENN_CV = "N/A"
+        Omit_count = Omit_count + 1
+        print "Class " + str(Class_count) + " ENN_CV omitted from calculation due to geometry."
+    try:
+        ECON = abs((bf.iat[(i+n_classes),8] - bf.iat[i,8])/ bf.iat[i,8])
+    except:
+        ECON = "N/A"
+        Omit_count = Omit_count + 1
+        print "Class " + str(Class_count) + " ECON_AM omitted from calculation due to geometry."
+    Class = "Class " + str(Class_count)
+    outro.at[0+i, 0] = Class
+    outro.at[0+i, 1] = NP
+    outro.at[0+i, 2] = GYRATE
+    outro.at[0+i, 3] = FRAC
+    outro.at[0+i, 4] = CORE
+    outro.at[0+i, 5] = ENN_AM
+    outro.at[0+i, 6] = ENN_CV
+    outro.at[0+i, 7] = ECON
+    omit.at[0+i, 0] = 7 - Omit_count
+    i = i + 1
+outro['SUM'] = (outro[outro.columns].sum(axis=1))
+outro = pd.concat([outro, omit], axis=1)
+outro.columns = ["Class", "NP", "GYRATE", "FRAC", "CORE", "ENN_AM", "ENN_CV", "ECON", "SUM", "Omit"]
+
+def calculate_Cdif(row):
+    return row['SUM']/row['Omit']
+outro['Config Dif'] = outro.apply(calculate_Cdif, axis=1)
+print outro
+try:
+    temp = temppath + "\\plus_ras"
+    arcpy.Delete_management(temp)
+except arcpy.ExecuteError:
+    pass
 shutil.rmtree(temppath)
