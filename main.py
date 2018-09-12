@@ -1,170 +1,108 @@
-import arcpy, os, numpy, shutil
+import os, shutil
 import pandas as pd
-from numpy import *
-from arcpy import env
-from arcpy.sa import *
-arcpy.CheckOutExtension("Spatial")
+import numpy as np
+import rasterio as rio
+from sklearn.metrics import confusion_matrix
+#import matplotlib.pyplot as plt
+from gooey import Gooey, GooeyParser
+#from message import display_message
 
-abspath = sys.argv[0]
-dname = os.path.dirname(abspath)
-temppath = dname + "\\ztemp12345" 
-if not os.path.isdir(temppath):
-   os.makedirs(temppath)
-arcpy.env.workspace= temppath
+def omission(label, conf_matrix):
+    rows, cols = conf_matrix.shape #number of rows and colums is identical in a N x N confusion matrix
+    row_omit = conf_matrix[label, :][np.arange(cols) != label].sum()
+    row_tot = conf_matrix[label, :].sum()
+    omit = row_omit.astype('float') / row_tot
+    return omit
 
-# User Specified Variables:
-Observation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/obs")
-Simulation = ("C:/1_EDF\Other Publication Work/AccuSim/Basic data for test/sim1")
-n_classes = 2
+def commission(label, conf_matrix):
+    rows, cols = conf_matrix.shape #number of rows and colums is identical in a N x N confusion matrix
+    col_commit = conf_matrix[:, label][np.arange(rows) != label].sum()
+    col_tot = conf_matrix[:, label].sum()
+    commit = col_commit.astype('float') / col_tot
+    return commit
 
-# Convert Simulation to order magnitude bigger for confusion matrix
-mod_simulation = (Raster(Simulation)+40)*100
+'''def plot_confusion_matrix(mat, classes, title='Confusion matrix', cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    """
+    plt.imshow(mat, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
 
-# Combine obs and sim to create confusion matrix
-matrix1 = mod_simulation + Raster(Observation)
-arcpy.TableToTable_conversion(matrix1, temppath, 'tempOutFile.dbf')
+    thresh = mat.max() / 2.
+    for i, j in itertools.product(range(mat.shape[0]), range(mat.shape[1])):
+        plt.text(j, i, format(cm[i, j], 'd'),
+                 horizontalalignment="center",
+                 color="white" if mat[i, j] > thresh else "black")
 
-# Create array of data
-location = temppath + '\\tempOutFile.dbf'
-rows = arcpy.SearchCursor(location,"","","")
-currentCOUNT = "COUNT"
-newdata = []
-for row in rows:
-        rowN = [row.getValue(currentCOUNT)]
-        newdata.append(rowN)
-del row, rows
-matrix = []
-for i in newdata:
-    x=str(i)
-    x=x[:-1]
-    x=x[1:]
-    x=float(x)
-    matrix.append(x)
-del i, newdata
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')'''
 
-# matrix created NOW do quantity and allocation disagreement
-maxcount = n_classes * n_classes
-matrix = array(matrix)
-tot = sum(matrix)
-pct_array=[]
-for i in matrix:
-    pct = i/tot
-    pct_array.append(pct)
-mylist = []
-df = pd.DataFrame()
-l = 1
-n=1
-col=1
-for i in matrix:
-    if l <= maxcount:
-        if n < n_classes:
-            mylist.append(i)
-            n=n+1
-            l=l+1
-        elif n == n_classes:
-            colname = str(col)
-            col=col+1
-            n=1
-            l=l+1
-            mylist.append(i)
-            row = pd.Series(mylist)
-            df[colname] = row.values
-            mylist = []
+@Gooey(dump_build_config=True, program_name="AccuSim")
+def main():
+    desc = "Write some description of AccuSim here!"
+    parser = GooeyParser(description=desc)
 
-# Begin converting matrix to pontius table
-tot = df.values.sum()
-df.div(tot)
+    parser.add_argument("Baseline", help="Select a baseline (e.g. observed) raster file from your local drive", widget="FileChooser")
+    parser.add_argument("Comparison", help="Select a comparison (e.g. simulated) raster file from your local drive", widget="FileChooser")
+    #my_cool_parser.add_argument("FileSaver", help=file_help_msg, widget="FileSaver")
+    parser.add_argument("Output", help="Directory to store output", widget='DirChooser')
+    parser.add_argument("-o", "--overwrite", action="store_true", help="Overwrite output file (if present)")
+    #my_cool_parser.add_argument("-w", "--writelog", default="writelogs", help="Dump output to local file")
+    #my_cool_parser.add_argument("-e", "--error", action="store_true", help="Stop process on error (default: No)")
+    #verbosity = my_cool_parser.add_mutually_exclusive_group()
+    #verbosity.add_argument('-t', '--verbozze', dest='verbose', action="store_true", help="Show more details")
+    #verbosity.add_argument('-q', '--quiet', dest='quiet', action="store_true", help="Only output on error")
+    fragstats_group = parser.add_argument_group(
+        "FRAGSTATS", 
+        "Customize here the desired metrics to be returned from the FRAGSTATS software"
+    )
 
-# Get Comission
-comis_minus = []
-i = 1
-ccount = 0
-while i <= n_classes:
-    colname = str(i)
-    comis1 = df[colname][ccount]
-    colsum = df[colname].sum()
-    add = (colsum - comis1)/tot
-    comis_minus.append(add)
-    i = i+1
-    ccount = ccount+1    
-extra = 0.0
-comis_minus.append(extra)
-corow = pd.Series(comis_minus)                
+    fragstats_group.add_argument(
+        '--metrics A', 
+        action="store_true",
+        help='Check the box to include'
+    )
+    fragstats_group.add_argument(
+        '--metrics B', 
+        action="store_true",
+        help='Check the box to include'
+    )
+    fragstats_group.add_argument(
+        '--metrics C', 
+        action="store_true",
+        help='Check the box to include'
+    )
 
-# Calculate Omission
-omis_minus = []
-ccount = 0
-i = 1
-while i <= n_classes:
-    omis1 = df.iloc[ccount, ccount]
-    rowsum = df.iloc[ccount].sum()
-    add = (rowsum - omis1)/tot
-    omis_minus.append(add)
-    ccount = ccount+1
-    i = i+1
-extra = 0.0
-omis_minus.append(extra)
-omis_minus.append(extra)
-omis_row = pd.Series(omis_minus)
+    args = parser.parse_args()
+    #display_message()
 
-# Divide by tot to get pcts in table
-i = 1
-ccount = 0
-while i <= n_classes:
-    colname = str(i)
-    df[colname] = (df[colname]/tot)
-    i = i+1
-    ccount = ccount+1    
+    obs_raster_path = args.Baseline
+    sim_raster_path = args.Comparison
 
-# Create table with comission and omission + totals
-df['Total'] = (df.sum(axis=1))
-df.loc['Sum'] = df.sum()
-df.loc['Comission'] = corow.values
-df['Omission'] = omis_row.values
+    # open raster data
+    with rio.open(obs_raster_path) as obs:
+        obs_array = obs.read(1)
 
-# Build output table
-Pontius_table = pd.DataFrame(columns = ["Class", "Omission", "Agreement", "Comission", "Quantity", "Allocation"])
-i = 1
-while i <= n_classes:
-    row = []
-    Cat = "Category " + str(i)
-    val = i-1
-    Omis = (df.iloc[val][3])*100
-    Agree = (df.iloc[val][val])*100
-    Comis = (df.iloc[3][val])*100
-    Quant = abs(Omis - Comis)
-    Alloc = 2*(minimum(Omis, Comis))
-    row.append(Cat)
-    row.append(Omis)
-    row.append(Agree)
-    row.append(Comis)
-    row.append(Quant)
-    row.append(Alloc)
-    row1 = pd.Series(row)
-    place = str(val)
-    Pontius_table.loc[i] = row1.values
-    i=i+1
+    with rio.open(sim_raster_path) as sim:
+        sim_array = sim.read(1)
 
-Quant_total = (Pontius_table["Quantity"].sum())/2
-Alloc_total = (Pontius_table["Allocation"].sum())/2
-totals = []
-tot = "Total Disageement"
-noval = "- - -"
-totals.append(tot)
-totals.append(noval)
-totals.append(noval)
-totals.append(noval)
-totals.append(Quant_total)
-totals.append(Alloc_total)
-totals1 = pd.Series(totals)
-x = i+1
-Pontius_table.loc[x] = totals1.values
+    # Compute confusion matrix
+    y_true = obs_array.reshape(obs_array.shape[0] * obs_array.shape[1])
+    y_pred = sim_array.reshape(sim_array.shape[0] * sim_array.shape[1])    
+    cm = confusion_matrix(y_true, y_pred)
+    cm_rows, cm_columns = cm.shape #number of rows and colums is identical in a N x N confusion matrix
 
-print Pontius_table
-mod_simulation.save(os.path.join(temppath,'tmp_modsim'))
-arcpy.Delete_management(mod_simulation)
-matrix1.save(os.path.join(temppath,'tmp_matrix'))
-arcpy.Delete_management(matrix1)
+    print("Label Omission Commission Quantity Allocation")
+    for label in range(cm_rows):
+        quantity = abs(omission(label, cm) - commission(label, cm))
+        allocation = 2 * min(omission(label, cm), commission(label, cm))
+        print(f"{label:5d} {omission(label, cm):12.2f} {commission(label, cm):17.2f} {quantity:16.2f} {allocation:13.2f}")
 
-del mod_simulation, matrix1
-shutil.rmtree(temppath)
+
+if __name__ == '__main__':
+    main()
