@@ -6,7 +6,7 @@
   "sidebar_title": "Actions",
   "default_size": [
     610,
-    530
+    650
   ],
   "auto_start": false,
   "show_advanced": true,
@@ -22,7 +22,7 @@
   "num_optional_cols": 2,
   "manual_start": false,
   "monospace_display": false,
-  "image_dir": "::gooey/default",
+  "image_dir": "./img",
   "language_dir": "D:\\Anaconda3\\envs\\AccuSim\\lib\\site-packages\\gooey\\languages",
   "progress_regex": null,
   "progress_expr": null,
@@ -107,25 +107,65 @@
               }
             },
             {
-              "id": "Output",
+              "id": "Working_Directory",
               "type": "DirChooser",
               "cli_type": "positional",
               "required": true,
               "data": {
-                "display_name": "Output",
-                "help": "Directory to store output",
+                "display_name": "Working_Directory",
+                "help": "Main working directory containing all the necessary input files",
                 "required": true,
                 "nargs": "",
                 "commands": [],
                 "choices": [],
                 "default": null,
-                "dest": "Output"
+                "dest": "Working_Directory"
               },
               "options": {
                 "error_color": "#ea7878",
                 "validator": {
                   "test": "user_input and not user_input.isspace()",
                   "message": "This field is required"
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            }
+          ],
+          "groups": [],
+          "description": null,
+          "options": {
+            "columns": 2,
+            "padding": 10,
+            "show_border": false
+          }
+        },
+        {
+          "name": "FRAGSTATS",
+          "items": [
+            {
+              "id": "--Calculate metrics",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "Calculate metrics",
+                "help": "Check the box to include",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--Calculate metrics"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "Calculate metrics"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "validator": {
+                  "test": "True",
+                  "message": ""
                 },
                 "external_validator": {
                   "cmd": ""
@@ -176,102 +216,6 @@
           ],
           "groups": [],
           "description": null,
-          "options": {
-            "columns": 2,
-            "padding": 10,
-            "show_border": false
-          }
-        },
-        {
-          "name": "FRAGSTATS",
-          "items": [
-            {
-              "id": "--metrics A",
-              "type": "CheckBox",
-              "cli_type": "optional",
-              "required": false,
-              "data": {
-                "display_name": "metrics A",
-                "help": "Check the box to include",
-                "required": false,
-                "nargs": "",
-                "commands": [
-                  "--metrics A"
-                ],
-                "choices": [],
-                "default": false,
-                "dest": "metrics A"
-              },
-              "options": {
-                "error_color": "#ea7878",
-                "validator": {
-                  "test": "True",
-                  "message": ""
-                },
-                "external_validator": {
-                  "cmd": ""
-                }
-              }
-            },
-            {
-              "id": "--metrics B",
-              "type": "CheckBox",
-              "cli_type": "optional",
-              "required": false,
-              "data": {
-                "display_name": "metrics B",
-                "help": "Check the box to include",
-                "required": false,
-                "nargs": "",
-                "commands": [
-                  "--metrics B"
-                ],
-                "choices": [],
-                "default": false,
-                "dest": "metrics B"
-              },
-              "options": {
-                "error_color": "#ea7878",
-                "validator": {
-                  "test": "True",
-                  "message": ""
-                },
-                "external_validator": {
-                  "cmd": ""
-                }
-              }
-            },
-            {
-              "id": "--metrics C",
-              "type": "CheckBox",
-              "cli_type": "optional",
-              "required": false,
-              "data": {
-                "display_name": "metrics C",
-                "help": "Check the box to include",
-                "required": false,
-                "nargs": "",
-                "commands": [
-                  "--metrics C"
-                ],
-                "choices": [],
-                "default": false,
-                "dest": "metrics C"
-              },
-              "options": {
-                "error_color": "#ea7878",
-                "validator": {
-                  "test": "True",
-                  "message": ""
-                },
-                "external_validator": {
-                  "cmd": ""
-                }
-              }
-            }
-          ],
-          "groups": [],
-          "description": "Customize here the desired metrics to be returned from the FRAGSTATS software",
           "options": {
             "columns": 2,
             "padding": 10,
