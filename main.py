@@ -10,7 +10,8 @@ import utils
 @Gooey(dump_build_config=True, 
        program_name="AccuSim", 
        image_dir="./img",
-       default_size=(610, 650))
+       default_size=(610, 710)
+       )
 def main():
     desc = "Write some description of AccuSim here!"
     parser = GooeyParser(description=desc)
@@ -18,7 +19,7 @@ def main():
     parser.add_argument("Baseline", help="Select a baseline (e.g. observed) raster file from your local drive", widget="FileChooser")
     parser.add_argument("Comparison", help="Select a comparison (e.g. simulated) raster file from your local drive", widget="FileChooser")
     #my_cool_parser.add_argument("FileSaver", help=file_help_msg, widget="FileSaver")
-    parser.add_argument("Working_Directory", help="Main working directory containing all the necessary input files", widget='DirChooser')
+    parser.add_argument("Output_Directory", help="Main working directory containing all the necessary input files", widget='DirChooser')
     #parser.add_argument("-o", "--overwrite", action="store_true", help="Overwrite output file (if present)")
     #my_cool_parser.add_argument("-w", "--writelog", default="writelogs", help="Dump output to local file")
     #my_cool_parser.add_argument("-e", "--error", action="store_true", help="Stop process on error (default: No)")
@@ -26,7 +27,11 @@ def main():
     #verbosity.add_argument('-t', '--verbozze', dest='verbose', action="store_true", help="Show more details")
     #verbosity.add_argument('-q', '--quiet', dest='quiet', action="store_true", help="Only output on error")
     fragstats_group = parser.add_argument_group(
-        "FRAGSTATS"
+        "FRAGSTATS",
+        gooey_options={
+            'show_border': False,
+            'columns': 1 
+        }
     )
 
     fragstats_group.add_argument(
@@ -34,6 +39,12 @@ def main():
         action="store_true",
         help="Check the box to include"
     )
+    
+    '''fragstats_group.add_argument(
+        "-e", "--Executable_File_Location",
+        widget="FileChooser",
+        help="Select the FRAGSTATS executable (.exe) file"
+    )'''
 
     optArgs_group = parser.add_argument_group(
         "Optional Arguments"
@@ -51,7 +62,7 @@ def main():
     #Read params from the GUI
     base_raster_path = args.Baseline
     comp_raster_path = args.Comparison
-    out_dir = args.Working_Directory
+    out_dir = args.Output_Directory
 
     # open raster data
     with rio.open(base_raster_path) as base:
@@ -72,15 +83,13 @@ def main():
     #FRAGSTATS SECTION
     #-----------------------------------------
 
-    # Define FRAGSTATS input using mandatory format #
-    base_str_fgst = base_raster_path + ",x,999,x,x,1,x,IDF_GeoTIFF"
-    comp_str_fgst = comp_raster_path + ",x,999,x,x,1,x,IDF_GeoTIFF"
-
     # Write required .fbt batchfile needed by FRAGSTATS 
-    utils.write_csv_fragstats(folder = out_dir, filename = "fragbatchinput.csv", base_input = base_str_fgst, comp_input = comp_str_fgst)
+    utils.write_csv_fragstats(folder = out_dir, baseline = base_raster_path, comparison = comp_raster_path)
 
     # Run FRAGSTATS
-    #utils.run_fragstats(obs_path, sim_path, n_classes)
+    utils.run_fragstats(folder = out_dir, fbt = "fragbatchinput.fbt",
+                        baseline = base_raster_path, comparison = comp_raster_path, 
+                        nclasses = n_classes)
 
 
 if __name__ == '__main__':

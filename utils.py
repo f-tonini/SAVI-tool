@@ -1,6 +1,7 @@
 import os, shutil, csv
 import pandas as pd
 import numpy as np
+import re
 from sklearn.metrics import confusion_matrix
 
 def calc_confusion_matrix(labels_true, labels_pred):
@@ -43,37 +44,56 @@ def commission(label, conf_matrix):
     plt.ylabel('True label')
     plt.xlabel('Predicted label')'''
 
-def write_csv_fragstats(folder, filename, base_input, comp_input):
+def write_csv_fragstats(folder, baseline, comparison):
+    # Define FRAGSTATS input using mandatory format #
+    base_str_fgst = baseline + ",x,999,x,x,1,x,IDF_GeoTIFF"
+    comp_str_fgst = comparison + ",x,999,x,x,1,x,IDF_GeoTIFF"
+    
+    fbt_file = os.path.join(folder, "fragbatchinput.fbt")
+    out_csv_path = os.path.join(folder, "fragbatchinput.csv")
+    if os.path.exists(fbt_file):
+        os.remove(fbt_file)
     # create the output writer
-    out_csv_path = os.path.join(folder, filename)
     with open(out_csv_path, 'w') as csvfile:
         outWriter = csv.writer(csvfile, delimiter=',', lineterminator='\n')
-        all_rows = [[base_input], [comp_input]]
+        all_rows = [[base_str_fgst], [comp_str_fgst]]
         for row in all_rows:
             outWriter.writerow(row)
-
     #rename .csv file to .fbt extension for fragstats
-    os.rename(out_csv_path, out_csv_path[:-4] + '.fbt')
-
+    new_file_name = out_csv_path[:-4] + ".fbt"
+    os.rename(out_csv_path, new_file_name)
     return
 
-'''def run_fragstats(baseline, comparison, nclasses):
+def run_fragstats(folder, fbt, baseline, comparison, nclasses):
 
-    # Specify FRAGSTATS model
-    sys.argv[0] os.path.dirname(abspath)
-    model = "frag_" + str(int(nclasses)) + "class.fca"
-    frag_model = dname + '\\frag_models\\' + model
-    shutil.copy(frag_model, temppath)
-    getEXE = dname + "\\frg.exe"
-    shutil.copy(getEXE, temppath)
-    results = "Result\\\\fragResult" 
-    systemcall = 'frg.exe -m ' + model + ' -b fragbatchinput.fbt -o ' + results
-    os.chdir(temppath)
-    os.makedirs(temppath + "\\Result")
-    os.system(systemcall)
+    # Specify FRAGSTATS model and copy the .fca file to user-defined output folder
+    fca_file = "frag_" + str(nclasses) + "class.fca"
+    fca_path = os.path.join(os.getcwd(), "frag_models", fca_file)
+    shutil.copy(fca_path, folder)
+
+    # define the path to the fragstats .exe file and copy the file to the user-defined output folder
+    #exe_file_path = os.path.join(os.getcwd(), "frg.exe")
+    #shutil.copy(exe_file_path, folder)
+    exe_file_path = '"C:\\Program Files (x86)\\Fragstats 4\\frg"'
+
+    # define the results folder to store fragstats model output
+    results_path = os.path.join(folder, "fragout")
+    # format to work appropriately with systemcall(): replace \\ with \\\\ 
+    #results_path = results_path.replace("\\","\\\\")
+
+    cmd = exe_file_path + ' -m ' + fca_file + ' -b ' + fbt + ' -o ' + "Result\\\\fragResult"
+    print(cmd)
+    #systemcall = exe_file_path + ' -m ' + fca_file + ' -b ' + fbt + ' -o ' + "Result/fragResult" 
+    #systemcall = systemcall.replace("\\","\\\\")
+    #print(systemcall)
+
+    os.chdir(folder)
+    os.system(cmd)
+    return
+
 
     # Calculate FRAG results
-    result = temppath + "\\Result\\fragResult.class"
+    '''result = temppath + "\\Result\\fragResult.class"
     bf = pd.read_csv(result)
     outro = pd.DataFrame()
     omit = pd.DataFrame()

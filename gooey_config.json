@@ -6,7 +6,7 @@
   "sidebar_title": "Actions",
   "default_size": [
     610,
-    650
+    710
   ],
   "auto_start": false,
   "show_advanced": true,
@@ -107,19 +107,19 @@
               }
             },
             {
-              "id": "Working_Directory",
+              "id": "Output_Directory",
               "type": "DirChooser",
               "cli_type": "positional",
               "required": true,
               "data": {
-                "display_name": "Working_Directory",
+                "display_name": "Output_Directory",
                 "help": "Main working directory containing all the necessary input files",
                 "required": true,
                 "nargs": "",
                 "commands": [],
                 "choices": [],
                 "default": null,
-                "dest": "Working_Directory"
+                "dest": "Output_Directory"
               },
               "options": {
                 "error_color": "#ea7878",
@@ -176,7 +176,7 @@
           "groups": [],
           "description": null,
           "options": {
-            "columns": 2,
+            "columns": 1,
             "padding": 10,
             "show_border": false
           }
