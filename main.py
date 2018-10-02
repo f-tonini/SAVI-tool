@@ -1,4 +1,4 @@
-import os, shutil, csv
+import os, shutil, time, errno
 import pandas as pd
 import numpy as np
 import rasterio as rio
@@ -10,16 +10,15 @@ import utils
 @Gooey(dump_build_config=True, 
        program_name="AccuSim", 
        image_dir="./img",
-       default_size=(610, 710)
+       default_size=(610, 750)
        )
 def main():
     desc = "Write some description of AccuSim here!"
     parser = GooeyParser(description=desc)
 
-    parser.add_argument("Baseline", help="Select a baseline (e.g. observed) raster file from your local drive", widget="FileChooser")
-    parser.add_argument("Comparison", help="Select a comparison (e.g. simulated) raster file from your local drive", widget="FileChooser")
+    parser.add_argument("Baseline", help="Select a baseline (e.g. observed) raster file", widget="FileChooser")
+    parser.add_argument("Comparison", help="Select a comparison (e.g. simulated) raster file", widget="FileChooser")
     #my_cool_parser.add_argument("FileSaver", help=file_help_msg, widget="FileSaver")
-    parser.add_argument("Output_Directory", help="Main working directory containing all the necessary input files", widget='DirChooser')
     #parser.add_argument("-o", "--overwrite", action="store_true", help="Overwrite output file (if present)")
     #my_cool_parser.add_argument("-w", "--writelog", default="writelogs", help="Dump output to local file")
     #my_cool_parser.add_argument("-e", "--error", action="store_true", help="Stop process on error (default: No)")
@@ -40,11 +39,11 @@ def main():
         help="Check the box to include"
     )
     
-    '''fragstats_group.add_argument(
-        "-e", "--Executable_File_Location",
-        widget="FileChooser",
-        help="Select the FRAGSTATS executable (.exe) file"
-    )'''
+    fragstats_group.add_argument(
+        "--Executable_File_Location",
+        widget="DirChooser",
+        help="Select the folder of the FRAGSTATS executable (.exe) file"
+    )
 
     optArgs_group = parser.add_argument_group(
         "Optional Arguments"
@@ -62,7 +61,7 @@ def main():
     #Read params from the GUI
     base_raster_path = args.Baseline
     comp_raster_path = args.Comparison
-    out_dir = args.Output_Directory
+    exe_location = args.Executable_File_Location
 
     # open raster data
     with rio.open(base_raster_path) as base:
@@ -79,18 +78,28 @@ def main():
         quantity = abs(utils.omission(label, cm) - utils.commission(label, cm))
         allocation = 2 * min(utils.omission(label, cm), utils.commission(label, cm))
         print(f"{label:5d} {utils.omission(label, cm):12.2f} {utils.commission(label, cm):17.2f} {quantity:16.2f} {allocation:13.2f}")
+    print('\n')
 
     #FRAGSTATS SECTION
     #-----------------------------------------
 
+    temp_dir = "C:\\temp" + time.strftime("%d%m%Y")
+    if not os.path.exists(temp_dir):
+        try:
+            os.makedirs(temp_dir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
     # Write required .fbt batchfile needed by FRAGSTATS 
-    utils.write_csv_fragstats(folder = out_dir, baseline = base_raster_path, comparison = comp_raster_path)
+    utils.write_fbt_fragstats(dir_name = temp_dir, baseline = base_raster_path, comparison = comp_raster_path)
 
     # Run FRAGSTATS
-    utils.run_fragstats(folder = out_dir, fbt = "fragbatchinput.fbt",
+    utils.run_fragstats(dir_name = temp_dir, fbt = "fragbatchinput.fbt", exe_path = exe_location,
                         baseline = base_raster_path, comparison = comp_raster_path, 
                         nclasses = n_classes)
 
+    ##TO DO REMOVE TEMP FOLDER PATH
 
 if __name__ == '__main__':
     main()

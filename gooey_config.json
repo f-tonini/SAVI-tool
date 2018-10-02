@@ -6,7 +6,7 @@
   "sidebar_title": "Actions",
   "default_size": [
     610,
-    710
+    750
   ],
   "auto_start": false,
   "show_advanced": true,
@@ -61,7 +61,7 @@
               "required": true,
               "data": {
                 "display_name": "Baseline",
-                "help": "Select a baseline (e.g. observed) raster file from your local drive",
+                "help": "Select a baseline (e.g. observed) raster file",
                 "required": true,
                 "nargs": "",
                 "commands": [],
@@ -87,39 +87,13 @@
               "required": true,
               "data": {
                 "display_name": "Comparison",
-                "help": "Select a comparison (e.g. simulated) raster file from your local drive",
+                "help": "Select a comparison (e.g. simulated) raster file",
                 "required": true,
                 "nargs": "",
                 "commands": [],
                 "choices": [],
                 "default": null,
                 "dest": "Comparison"
-              },
-              "options": {
-                "error_color": "#ea7878",
-                "validator": {
-                  "test": "user_input and not user_input.isspace()",
-                  "message": "This field is required"
-                },
-                "external_validator": {
-                  "cmd": ""
-                }
-              }
-            },
-            {
-              "id": "Output_Directory",
-              "type": "DirChooser",
-              "cli_type": "positional",
-              "required": true,
-              "data": {
-                "display_name": "Output_Directory",
-                "help": "Main working directory containing all the necessary input files",
-                "required": true,
-                "nargs": "",
-                "commands": [],
-                "choices": [],
-                "default": null,
-                "dest": "Output_Directory"
               },
               "options": {
                 "error_color": "#ea7878",
@@ -160,6 +134,34 @@
                 "choices": [],
                 "default": false,
                 "dest": "Calculate metrics"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "--Executable_File_Location",
+              "type": "DirChooser",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "Executable_File_Location",
+                "help": "Select the folder of the FRAGSTATS executable (.exe) file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--Executable_File_Location"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "Executable_File_Location"
               },
               "options": {
                 "error_color": "#ea7878",
