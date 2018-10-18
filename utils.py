@@ -2,24 +2,80 @@ import os, shutil, errno
 import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix
+from tabulate import tabulate
 
 def calc_confusion_matrix(labels_true, labels_pred):
     cm = confusion_matrix(labels_true, labels_pred)
     n_classes = cm.shape[0] #number of rows and colums is identical in a N x N confusion matrix
     return cm, n_classes
 
+def overall_accuracy(conf_matrix):
+    acc = np.trace(conf_matrix)
+    tot = conf_matrix.sum()
+    return (acc / tot) * 100
+
+def class_success(nclasses, conf_matrix):
+    rows, cols = conf_matrix.shape
+    omit_commit_sum = 0
+    for label in nclasses:
+        row_omit = conf_matrix[label, :][np.arange(cols) != label].sum()    
+        col_commit = conf_matrix[:, label][np.arange(rows) != label].sum()
+        omit_commit_sum += (row_omit + col_commit)
+    csi = (1 - (omit_commit_sum / nclasses)) * 100
+    return csi
+
+def group_class_success():
+
+    return
+
+def kappa_coeff():
+    
+    return
+
+def cond_kappa():
+    
+    return
+
+def weight_kappa():
+    
+    return
+
+def tau_coeff():
+    
+    return
+
+def alpha_coeff():
+    
+    return
+
+def margfit():
+    
+    return
+
+def avg_user_accuracy(label, conf_matrix):
+    col_correct = conf_matrix[label, label]
+    col_tot = conf_matrix[:, label].sum()
+    usr_acc = (col_correct / col_tot) * 100
+    return usr_acc
+
+def avg_prod_accuracy(label, conf_matrix):
+    row_correct = conf_matrix[label, label]
+    row_tot = conf_matrix[label, :].sum()
+    prod_acc = (row_correct / row_tot) * 100
+    return prod_acc
+
 def omission(label, conf_matrix):
-    rows, cols = conf_matrix.shape #number of rows and colums is identical in a N x N confusion matrix
+    cols = conf_matrix.shape[1] #number of rows and colums is identical in a N x N confusion matrix
     row_omit = conf_matrix[label, :][np.arange(cols) != label].sum()
     row_tot = conf_matrix[label, :].sum()
-    omit = row_omit.astype('float') / row_tot
+    omit = (row_omit / row_tot) * 100
     return omit
 
 def commission(label, conf_matrix):
-    rows, cols = conf_matrix.shape #number of rows and colums is identical in a N x N confusion matrix
+    rows = conf_matrix.shape[0] #number of rows and colums is identical in a N x N confusion matrix
     col_commit = conf_matrix[:, label][np.arange(rows) != label].sum()
     col_tot = conf_matrix[:, label].sum()
-    commit = col_commit.astype('float') / col_tot
+    commit = (col_commit / col_tot) * 100
     return commit
 
 '''def plot_confusion_matrix(mat, classes, title='Confusion matrix', cmap=plt.cm.Blues):
@@ -62,8 +118,9 @@ def write_fbt_fragstats(dir_name, baseline, comparison):
 
     return
 
-def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses):
+def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses, fout):
 
+    print('Running FRAGSTATS module...')
     # Specify FRAGSTATS model and copy the .fca file to user-defined output folder
     fca_file = "frag_" + str(nclasses) + "class.fca"
     fca_path = os.path.join(os.getcwd(), "frag_models", fca_file)
@@ -80,7 +137,8 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses):
 
     # define the results folder to store fragstats model output
     #results_path = os.path.join(folder, "fragout")
-    out_folder = os.path.join(dir_name, "fragout")
+    out_folder_name = "fragout"
+    out_folder = os.path.join(dir_name, out_folder_name)
     if not os.path.exists(out_folder):
         try:
             os.makedirs(out_folder)
@@ -103,7 +161,7 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses):
     outro = pd.DataFrame()
     omit = pd.DataFrame()
 
-    print('\n')
+    print('Computing FRAGSTATS Accuracy Metrics...')
     for i in range(nclasses):
         Omit_count = 0
         Class_count = i + 1
@@ -112,7 +170,7 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses):
         except:
             NP = "N/A"
             Omit_count += 1 
-            print("Class " + str(Class_count) + " Number of Patches omitted from calculation due to geometry.")
+            print("Class " + str(Class_count) + " Number of patches omitted from calculation due to geometry.")
         try:
             GYRATE = abs((df.iat[(i+nclasses),3] - df.iat[i,3])/ df.iat[i,3])
         except:
@@ -150,8 +208,7 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses):
             Omit_count += 1
             print("Class " + str(Class_count) + " ECON_AM omitted from calculation due to geometry.")
 
-        Class = "Class " + str(Class_count)
-        outro.at[i, 0] = Class
+        outro.at[i, 0] = i
         outro.at[i, 1] = NP
         outro.at[i, 2] = GYRATE
         outro.at[i, 3] = FRAC
@@ -163,19 +220,20 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses):
 
     outro['SUM'] = (outro[outro.columns].sum(axis=1))
     outro = pd.concat([outro, omit], axis=1)
-    outro.columns = ["Class", "NP", "GYRATE", "FRAC", "CORE", "ENN_AM", "ENN_CV", "ECON", "SUM", "Omit"]
+    outro.columns = ["Label", "NP", "GYRATE", "FRAC", "CORE", "ENN_AM", "ENN_CV", "ECON", "SUM", "Omit"]
 
     def calculate_Cdif(row):
         return row['SUM']/row['Omit']
+
     outro['Config Dif'] = outro.apply(calculate_Cdif, axis=1)
     
     pd.set_option('display.max_columns', 20)
     pd.set_option('display.width', 1000)
     print('\n')
-    print(outro)
+    print(outro.to_string(index=False))
 
+    # Save to output file
+    print("Saving Output Table to File...")
+    outro.to_csv(os.path.join(fout, "AccuSim_FRAGSTATS.csv"), index=False)
+    
     return
-
-
-
-

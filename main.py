@@ -13,11 +13,12 @@ import utils
        default_size=(610, 750)
        )
 def main():
-    desc = "Write some description of AccuSim here!"
+    desc = "AccuSim is a GUI-based program to help users calculate accuracy metrics for land-use/land-change simulation models."
     parser = GooeyParser(description=desc)
 
     parser.add_argument("Baseline", help="Select a baseline (e.g. observed) raster file", widget="FileChooser")
     parser.add_argument("Comparison", help="Select a comparison (e.g. simulated) raster file", widget="FileChooser")
+    parser.add_argument("Output_Folder", help="Select a folder where you want to save your output metrics table", widget="DirChooser")
     #my_cool_parser.add_argument("FileSaver", help=file_help_msg, widget="FileSaver")
     #parser.add_argument("-o", "--overwrite", action="store_true", help="Overwrite output file (if present)")
     #my_cool_parser.add_argument("-w", "--writelog", default="writelogs", help="Dump output to local file")
@@ -61,6 +62,7 @@ def main():
     #Read params from the GUI
     base_raster_path = args.Baseline
     comp_raster_path = args.Comparison
+    out_dir = args.Output_Folder
     exe_location = args.Executable_File_Location
 
     # open raster data
@@ -70,20 +72,34 @@ def main():
         comp_array = comp.read(1)
 
     # Compute confusion matrix
+    print('Computing Confusion Matrix from Rasters...')
     y_base = base_array.reshape(base_array.shape[0] * base_array.shape[1])
     y_comp = comp_array.reshape(comp_array.shape[0] * comp_array.shape[1])    
     cm, n_classes = utils.calc_confusion_matrix(labels_true = y_base, labels_pred = y_comp)
-    print("Label Omission Commission Quantity Allocation")
+    
+    # Compute Main Metrics
+    #-----------------------------------------
+    print('Computing Accuracy Metrics...')
+    print("Label Omission(%) Commission(%) Quantity Allocation")
+    val_lst = []
     for label in range(n_classes):
-        quantity = abs(utils.omission(label, cm) - utils.commission(label, cm))
-        allocation = 2 * min(utils.omission(label, cm), utils.commission(label, cm))
-        print(f"{label:5d} {utils.omission(label, cm):12.2f} {utils.commission(label, cm):17.2f} {quantity:16.2f} {allocation:13.2f}")
+        quantity_dsgr = abs(utils.omission(label, cm) - utils.commission(label, cm))
+        allocation_dsgr = 2 * min(utils.omission(label, cm), utils.commission(label, cm))
+        val_lst.append([label, utils.omission(label, cm), utils.commission(label, cm), quantity_dsgr, allocation_dsgr])
+        print(f"{label:5d} {utils.omission(label, cm):13.2f} {utils.commission(label, cm):21.2f} {quantity_dsgr:21.2f} {allocation_dsgr:14.2f}")
+    
+    # Save to output file
+    print("Saving Output Table to File...")
+    pontius_df = pd.DataFrame(val_lst)
+    pontius_df.columns = ["Label", "Omission Error(%)", "Commission Error(%)", "Quantity Disagreement", "Allocation Disagreement"]
+    pontius_df.to_csv(os.path.join(out_dir, "AccuSim.csv"), index=False)
     print('\n')
 
     #FRAGSTATS SECTION
     #-----------------------------------------
 
-    temp_dir = "C:\\temp" + time.strftime("%d%m%Y")
+    #TRY THIS %LocalAppData%
+    temp_dir = os.path.join(os.getenv('LOCALAPPDATA'), 'tmpAccuSim')
     if not os.path.exists(temp_dir):
         try:
             os.makedirs(temp_dir)
@@ -97,9 +113,7 @@ def main():
     # Run FRAGSTATS
     utils.run_fragstats(dir_name = temp_dir, fbt = "fragbatchinput.fbt", exe_path = exe_location,
                         baseline = base_raster_path, comparison = comp_raster_path, 
-                        nclasses = n_classes)
-
-    ##TO DO REMOVE TEMP FOLDER PATH
+                        nclasses = n_classes, fout = out_dir)
 
 if __name__ == '__main__':
     main()

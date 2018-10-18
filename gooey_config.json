@@ -2,7 +2,7 @@
   "language": "english",
   "target": "\"D:\\Anaconda3\\envs\\AccuSim\\python.exe\" -u \"main.py\"",
   "program_name": "AccuSim",
-  "program_description": "Write some description of AccuSim here!",
+  "program_description": "AccuSim is a GUI-based program to help users calculate accuracy metrics for land-use/land-change simulation models.",
   "sidebar_title": "Actions",
   "default_size": [
     610,
@@ -94,6 +94,32 @@
                 "choices": [],
                 "default": null,
                 "dest": "Comparison"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "validator": {
+                  "test": "user_input and not user_input.isspace()",
+                  "message": "This field is required"
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "Output_Folder",
+              "type": "DirChooser",
+              "cli_type": "positional",
+              "required": true,
+              "data": {
+                "display_name": "Output_Folder",
+                "help": "Select a folder where you want to save your output metrics table",
+                "required": true,
+                "nargs": "",
+                "commands": [],
+                "choices": [],
+                "default": null,
+                "dest": "Output_Folder"
               },
               "options": {
                 "error_color": "#ea7878",
