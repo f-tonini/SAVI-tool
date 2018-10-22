@@ -2,7 +2,6 @@ import os, shutil, errno
 import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix
-from tabulate import tabulate
 
 def calc_confusion_matrix(labels_true, labels_pred):
     cm = confusion_matrix(labels_true, labels_pred)
@@ -32,23 +31,7 @@ def kappa_coeff():
     
     return
 
-def cond_kappa():
-    
-    return
-
 def weight_kappa():
-    
-    return
-
-def tau_coeff():
-    
-    return
-
-def alpha_coeff():
-    
-    return
-
-def margfit():
     
     return
 
@@ -78,7 +61,8 @@ def commission(label, conf_matrix):
     commit = (col_commit / col_tot) * 100
     return commit
 
-'''def plot_confusion_matrix(mat, classes, title='Confusion matrix', cmap=plt.cm.Blues):
+'''
+def plot_confusion_matrix(mat, classes, title='Confusion matrix', cmap=plt.cm.Blues):
     """
     This function prints and plots the confusion matrix.
     """
@@ -97,7 +81,8 @@ def commission(label, conf_matrix):
 
     plt.tight_layout()
     plt.ylabel('True label')
-    plt.xlabel('Predicted label')'''
+    plt.xlabel('Predicted label')
+'''
 
 def write_fbt_fragstats(dir_name, baseline, comparison):
     # Define FRAGSTATS input using mandatory format #
@@ -135,7 +120,7 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses, fout)
     #exe_file_path = '"C:\\Program Files (x86)\\Fragstats 4\\frg"'
     #'"C:\\Program Files (x86)\\Fragstats 4\\frg"'
 
-    # define the results folder to store fragstats model output
+    #Define the results folder to store fragstats model output
     #results_path = os.path.join(folder, "fragout")
     out_folder_name = "fragout"
     out_folder = os.path.join(dir_name, out_folder_name)
@@ -147,8 +132,9 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses, fout)
                 raise
     results_path = "fragout\\\\fragResult"
 
+    #Full CMD to pass onto terminal via os.system()
     cmd = exe_file_path + ' -m ' + fca_file + ' -b ' + fbt + ' -o ' + results_path
-    
+    #Make sure to change dir to current script location
     os.chdir(dir_name)
     os.system(cmd)
 
@@ -156,84 +142,84 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses, fout)
     frag_out_file = results_path + ".class"
     result_file = os.path.join(dir_name, frag_out_file.replace('\\\\', '\\')) 
 
+    #Read FRAGSTATS result file into a pandas dataframe
     df = pd.read_csv(result_file)
 
+    #Define empty pandas dataframes
     outro = pd.DataFrame()
     omit = pd.DataFrame()
 
     print('Computing FRAGSTATS Accuracy Metrics...')
-    for i in range(nclasses):
+    for label in range(nclasses):
         Omit_count = 0
-        Class_count = i + 1
         try:
-            NP = abs((df.iat[(i+nclasses),2] - df.iat[i,2])/ df.iat[i,2])
+            NP = abs((df.iat[(label + nclasses), 2] - df.iat[label, 2])/ df.iat[label, 2])
         except:
             NP = "N/A"
             Omit_count += 1 
-            print("Class " + str(Class_count) + " Number of patches omitted from calculation due to geometry.")
+            print("Label " + str(label) + " Number of patches omitted from calculation due to geometry.")
         try:
-            GYRATE = abs((df.iat[(i+nclasses),3] - df.iat[i,3])/ df.iat[i,3])
+            GYRATE = abs((df.iat[(label + nclasses), 3] - df.iat[label, 3]) / df.iat[label, 3])
         except:
             GYRATE = "N/A"
             Omit_count += 1
-            print("Class " + str(Class_count) + " GYRATE_AM omitted from calculation due to geometry.")
+            print("Label " + str(label) + " GYRATE_AM omitted from calculation due to geometry.")
         try:
-            FRAC = abs((df.iat[(i+nclasses),4] - df.iat[i,4])/ df.iat[i,4])
+            FRAC = abs((df.iat[(label + nclasses), 4] - df.iat[label, 4]) / df.iat[label, 4])
         except:
             FRAC = "N/A"
             Omit_count += 1
-            print("Class " + str(Class_count) + " FRAC_AM omitted from calculation due to geometry.")
+            print("Label " + str(label) + " FRAC_AM omitted from calculation due to geometry.")
         try:
-            CORE = abs((df.iat[(i+nclasses),5] - df.iat[i,5])/ df.iat[i,5])
+            CORE = abs((df.iat[(label + nclasses), 5] - df.iat[label, 5]) / df.iat[label, 5])
         except:
             CORE = "N/A"
             Omit_count += 1
-            print("Class " + str(Class_count) + " CORE_AM omitted from calculation due to geometry.")
+            print("Label " + str(label) + " CORE_AM omitted from calculation due to geometry.")
         try:
-            ENN_AM = abs((df.iat[(i+nclasses),6] - df.iat[i,6])/ df.iat[i,6])
+            ENN_AM = abs((df.iat[(label + nclasses), 6] - df.iat[label, 6]) / df.iat[label, 6])
         except:
             ENN_AM = "N/A"
             Omit_count += 1
-            print("Class " + str(Class_count) + " ENN_AM omitted from calculation due to geometry.")
+            print("Label " + str(label) + " ENN_AM omitted from calculation due to geometry.")
         try:
-            ENN_CV = abs(df.iat[(i+nclasses),7] - df.iat[i,7])
+            ENN_CV = abs(df.iat[(label + nclasses), 7] - df.iat[label, 7])
         except:
             ENN_CV = "N/A"
             Omit_count += 1
-            print("Class " + str(Class_count) + " ENN_CV omitted from calculation due to geometry.")
+            print("Label " + str(label) + " ENN_CV omitted from calculation due to geometry.")
         try:
-            ECON = abs((df.iat[(i+nclasses),8] - df.iat[i,8])/ df.iat[i,8])
+            ECON = abs((df.iat[(label + nclasses), 8] - df.iat[label, 8]) /df.iat[label, 8])
         except:
             ECON = "N/A"
             Omit_count += 1
-            print("Class " + str(Class_count) + " ECON_AM omitted from calculation due to geometry.")
+            print("Label " + str(label) + " ECON_AM omitted from calculation due to geometry.")
 
-        outro.at[i, 0] = i
-        outro.at[i, 1] = NP
-        outro.at[i, 2] = GYRATE
-        outro.at[i, 3] = FRAC
-        outro.at[i, 4] = CORE
-        outro.at[i, 5] = ENN_AM
-        outro.at[i, 6] = ENN_CV
-        outro.at[i, 7] = ECON
-        omit.at[i, 0] = 7 - Omit_count
+        outro.at[label, 0] = i
+        outro.at[label, 1] = NP
+        outro.at[label, 2] = GYRATE
+        outro.at[label, 3] = FRAC
+        outro.at[label, 4] = CORE
+        outro.at[label, 5] = ENN_AM
+        outro.at[label, 6] = ENN_CV
+        outro.at[label, 7] = ECON
+        omit.at[label, 0] = 7 - Omit_count
 
-    outro['SUM'] = (outro[outro.columns].sum(axis=1))
-    outro = pd.concat([outro, omit], axis=1)
+    outro['SUM'] = (outro[outro.columns].sum(axis = 1))
+    outro = pd.concat([outro, omit], axis = 1)
     outro.columns = ["Label", "NP", "GYRATE", "FRAC", "CORE", "ENN_AM", "ENN_CV", "ECON", "SUM", "Omit"]
 
     def calculate_Cdif(row):
-        return row['SUM']/row['Omit']
+        return row['SUM'] / row['Omit']
 
-    outro['Config Dif'] = outro.apply(calculate_Cdif, axis=1)
+    outro['Config Dif'] = outro.apply(calculate_Cdif, axis = 1)
     
     pd.set_option('display.max_columns', 20)
     pd.set_option('display.width', 1000)
     print('\n')
-    print(outro.to_string(index=False))
+    print(outro.to_string(index = False))
 
     # Save to output file
     print("Saving Output Table to File...")
-    outro.to_csv(os.path.join(fout, "AccuSim_FRAGSTATS.csv"), index=False)
-    
+    outro.to_csv(os.path.join(fout, "AccuSim_FRAGSTATS.csv"), index = False)
     return

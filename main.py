@@ -10,50 +10,55 @@ import utils
 @Gooey(dump_build_config=True, 
        program_name="AccuSim", 
        image_dir="./img",
-       default_size=(610, 750)
+       default_size=(650, 515)
        )
 def main():
-    desc = "AccuSim is a GUI-based program to help users calculate accuracy metrics for land-use/land-change simulation models."
+    desc = "AccuSim is a GUI-based program to help users calculate accuracy metrics for\nland-use/land-change simulation models."
     parser = GooeyParser(description=desc)
 
-    parser.add_argument("Baseline", help="Select a baseline (e.g. observed) raster file", widget="FileChooser")
-    parser.add_argument("Comparison", help="Select a comparison (e.g. simulated) raster file", widget="FileChooser")
-    parser.add_argument("Output_Folder", help="Select a folder where you want to save your output metrics table", widget="DirChooser")
-    #my_cool_parser.add_argument("FileSaver", help=file_help_msg, widget="FileSaver")
-    #parser.add_argument("-o", "--overwrite", action="store_true", help="Overwrite output file (if present)")
-    #my_cool_parser.add_argument("-w", "--writelog", default="writelogs", help="Dump output to local file")
-    #my_cool_parser.add_argument("-e", "--error", action="store_true", help="Stop process on error (default: No)")
-    #verbosity = my_cool_parser.add_mutually_exclusive_group()
-    #verbosity.add_argument('-t', '--verbozze', dest='verbose', action="store_true", help="Show more details")
-    #verbosity.add_argument('-q', '--quiet', dest='quiet', action="store_true", help="Only output on error")
+    parser.add_argument(
+        "Baseline", 
+        help="Select a baseline (e.g. observed) raster file", 
+        widget="FileChooser",
+        gooey_options={
+            'validator':{
+            'test': 'user_input.split(".")[1] not in [".tif", ".img"]',
+            'message': 'The raster file extension must be .tif or .img'
+            }
+        }
+    )
+    parser.add_argument(
+        "Comparison", 
+        help="Select a comparison (e.g. simulated) raster file", 
+        widget="FileChooser",
+        gooey_options={
+            'validator':{
+            'test': 'user_input.split(".")[1] not in [".tif", ".img"]',
+            'message': 'The raster file extension must be .tif or .img'
+            }
+        }
+    )
+    parser.add_argument("Output_Folder", help="Select a folder where you want to save your output metrics files", widget="DirChooser")
+    
     fragstats_group = parser.add_argument_group(
-        "FRAGSTATS",
+        "FRAGSTATS (for Windows users ONLY)",
         gooey_options={
             'show_border': False,
-            'columns': 1 
+            'columns': 2 
         }
     )
 
     fragstats_group.add_argument(
         "--Calculate metrics", 
+        default=False,
         action="store_true",
-        help="Check the box to include"
+        help="Check the box"
     )
     
     fragstats_group.add_argument(
         "--Executable_File_Location",
         widget="DirChooser",
         help="Select the folder of the FRAGSTATS executable (.exe) file"
-    )
-
-    optArgs_group = parser.add_argument_group(
-        "Optional Arguments"
-    )
-
-    optArgs_group.add_argument(
-        "-o", "--overwrite",  
-        action="store_true",
-        help="Overwrite output file (if present)"
     )
 
     args = parser.parse_args()
