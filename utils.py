@@ -2,7 +2,7 @@ import os, shutil, errno
 import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix
-from tabulate import tabulate
+from sklearn.metrics import cohen_kappa_score
 
 def calc_confusion_matrix(labels_true, labels_pred):
     cm = confusion_matrix(labels_true, labels_pred)
@@ -14,43 +14,24 @@ def overall_accuracy(conf_matrix):
     tot = conf_matrix.sum()
     return (acc / tot) * 100
 
-def class_success(nclasses, conf_matrix):
+def class_success(conf_matrix):
     rows, cols = conf_matrix.shape
+    nclasses = rows
     omit_commit_sum = 0
-    for label in nclasses:
+    for label in range(nclasses):
         row_omit = conf_matrix[label, :][np.arange(cols) != label].sum()    
         col_commit = conf_matrix[:, label][np.arange(rows) != label].sum()
         omit_commit_sum += (row_omit + col_commit)
     csi = (1 - (omit_commit_sum / nclasses)) * 100
     return csi
 
-def group_class_success():
+def kappa_coeff(labels_true, labels_pred):
+    k = cohen_kappa_score(labels_true, labels_pred) * 100
+    return k
 
-    return
-
-def kappa_coeff():
-    
-    return
-
-def cond_kappa():
-    
-    return
-
-def weight_kappa():
-    
-    return
-
-def tau_coeff():
-    
-    return
-
-def alpha_coeff():
-    
-    return
-
-def margfit():
-    
-    return
+def kappa_w(labels_true, labels_pred):
+    k_w = cohen_kappa_score(labels_true, labels_pred, weights='quadratic') * 100
+    return k_w
 
 def avg_user_accuracy(label, conf_matrix):
     col_correct = conf_matrix[label, label]

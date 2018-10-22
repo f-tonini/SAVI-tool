@@ -1,4 +1,4 @@
-import os, shutil, time, errno
+import os, shutil, time, errno, csv
 import pandas as pd
 import numpy as np
 import rasterio as rio
@@ -88,11 +88,27 @@ def main():
         val_lst.append([label, utils.omission(label, cm), utils.commission(label, cm), quantity_dsgr, allocation_dsgr])
         print(f"{label:5d} {utils.omission(label, cm):13.2f} {utils.commission(label, cm):21.2f} {quantity_dsgr:21.2f} {allocation_dsgr:14.2f}")
     
+    print('\n')
+    print("Overall Accuracy(%) Classification Success Index(%) Cohen's Kappa(%) Weighted Kappa(%)")
+    ov_acc = utils.overall_accuracy(cm)
+    csi = utils.class_success(cm)
+    kappa = utils.kappa_coeff(y_base, y_comp)
+    kappaW = utils.kappa_w(y_base, y_comp)
+    print(f"{ov_acc:7.2f} {csi:13.2f} {kappa:13.2f} {kappaW:13.2f}")
+
     # Save to output file
     print("Saving Output Table to File...")
     pontius_df = pd.DataFrame(val_lst)
     pontius_df.columns = ["Label", "Omission Error(%)", "Commission Error(%)", "Quantity Disagreement", "Allocation Disagreement"]
-    pontius_df.to_csv(os.path.join(out_dir, "AccuSim.csv"), index=False)
+    out_file = os.path.join(out_dir, "AccuSim.csv")
+    pontius_df.to_csv(out_file, index=False)
+    with open(out_file, 'a') as csvFile:
+        writer = csv.writer(csvFile)
+        newdata = [["Overall Accuracy(%)", ov_acc], ["Classification Success Index(%)", csi], 
+        ["Cohen's Kappa(%)", kappa], ["Weighted Kappa(%)", kappaW]]
+        writer.writerow('\n')
+        writer.writerows(newdata)
+    csvFile.close()
     print('\n')
 
     #FRAGSTATS SECTION
