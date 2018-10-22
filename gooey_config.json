@@ -2,11 +2,11 @@
   "language": "english",
   "target": "\"D:\\Anaconda3\\envs\\AccuSim\\python.exe\" -u \"main.py\"",
   "program_name": "AccuSim",
-  "program_description": "AccuSim is a GUI-based program to help users calculate accuracy metrics for land-use/land-change simulation models.",
+  "program_description": "AccuSim is a GUI-based program to help users calculate accuracy metrics for\nland-use/land-change simulation models.",
   "sidebar_title": "Actions",
   "default_size": [
-    610,
-    750
+    650,
+    515
   ],
   "auto_start": false,
   "show_advanced": true,
@@ -72,8 +72,8 @@
               "options": {
                 "error_color": "#ea7878",
                 "validator": {
-                  "test": "user_input and not user_input.isspace()",
-                  "message": "This field is required"
+                  "test": "user_input.split(\".\")[1] not in [\".tif\", \".img\"]",
+                  "message": "The raster file extension must be .tif or .img"
                 },
                 "external_validator": {
                   "cmd": ""
@@ -98,8 +98,8 @@
               "options": {
                 "error_color": "#ea7878",
                 "validator": {
-                  "test": "user_input and not user_input.isspace()",
-                  "message": "This field is required"
+                  "test": "user_input.split(\".\")[1] not in [\".tif\", \".img\"]",
+                  "message": "The raster file extension must be .tif or .img"
                 },
                 "external_validator": {
                   "cmd": ""
@@ -113,7 +113,7 @@
               "required": true,
               "data": {
                 "display_name": "Output_Folder",
-                "help": "Select a folder where you want to save your output metrics table",
+                "help": "Select a folder where you want to save your output metrics files",
                 "required": true,
                 "nargs": "",
                 "commands": [],
@@ -142,7 +142,7 @@
           }
         },
         {
-          "name": "FRAGSTATS",
+          "name": "FRAGSTATS (for Windows users ONLY)",
           "items": [
             {
               "id": "--Calculate metrics",
@@ -151,7 +151,7 @@
               "required": false,
               "data": {
                 "display_name": "Calculate metrics",
-                "help": "Check the box to include",
+                "help": "Check the box",
                 "required": false,
                 "nargs": "",
                 "commands": [
@@ -188,47 +188,6 @@
                 "choices": [],
                 "default": null,
                 "dest": "Executable_File_Location"
-              },
-              "options": {
-                "error_color": "#ea7878",
-                "validator": {
-                  "test": "True",
-                  "message": ""
-                },
-                "external_validator": {
-                  "cmd": ""
-                }
-              }
-            }
-          ],
-          "groups": [],
-          "description": null,
-          "options": {
-            "columns": 1,
-            "padding": 10,
-            "show_border": false
-          }
-        },
-        {
-          "name": "Optional Arguments",
-          "items": [
-            {
-              "id": "-o",
-              "type": "CheckBox",
-              "cli_type": "optional",
-              "required": false,
-              "data": {
-                "display_name": "overwrite",
-                "help": "Overwrite output file (if present)",
-                "required": false,
-                "nargs": "",
-                "commands": [
-                  "-o",
-                  "--overwrite"
-                ],
-                "choices": [],
-                "default": false,
-                "dest": "overwrite"
               },
               "options": {
                 "error_color": "#ea7878",
