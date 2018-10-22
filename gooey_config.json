@@ -2,11 +2,11 @@
   "language": "english",
   "target": "\"D:\\Anaconda3\\envs\\AccuSim\\python.exe\" -u \"main.py\"",
   "program_name": "AccuSim",
-  "program_description": "AccuSim is a GUI-based program to help users calculate accuracy metrics for\nland-use/land-change simulation models.",
+  "program_description": "AccuSim is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool.",
   "sidebar_title": "Actions",
   "default_size": [
-    650,
-    515
+    715,
+    550
   ],
   "auto_start": false,
   "show_advanced": true,

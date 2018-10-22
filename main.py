@@ -10,10 +10,10 @@ import utils
 @Gooey(dump_build_config=True, 
        program_name="AccuSim", 
        image_dir="./img",
-       default_size=(650, 515)
+       default_size=(715, 550)
        )
 def main():
-    desc = "AccuSim is a GUI-based program to help users calculate accuracy metrics for\nland-use/land-change simulation models."
+    desc = "AccuSim is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool."
     parser = GooeyParser(description=desc)
 
     parser.add_argument(
