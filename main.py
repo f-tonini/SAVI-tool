@@ -8,12 +8,12 @@ from gooey import Gooey, GooeyParser
 import utils
 
 @Gooey(dump_build_config=True, 
-       program_name="Simulation Accuracy & Validation Informatics (SAVI)", 
+       program_name="Simulation Accuracy and Validation Informatics (SAVI)", 
        image_dir="./img",
        default_size=(715, 550)
        )
 def main():
-    desc = "SAVI is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool."
+    desc = "SAVI is a freely-available, GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file."
     parser = GooeyParser(description=desc)
 
     parser.add_argument(

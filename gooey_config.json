@@ -1,8 +1,8 @@
 {
   "language": "english",
-  "target": "\"D:\\Anaconda3\\envs\\AccuSim\\python.exe\" -u \"main.py\"",
-  "program_name": "Simulation Accuracy & Validation Informatics (SAVI)",
-  "program_description": "SAVI is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool.",
+  "target": "'/Users/ftonini/miniconda3/envs/AccuSim/bin/python' -u 'main.py'",
+  "program_name": "Simulation Accuracy and Validation Informatics (SAVI)",
+  "program_description": "SAVI is a freely-available, GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file.",
   "sidebar_title": "Actions",
   "default_size": [
     715,
@@ -23,7 +23,7 @@
   "manual_start": false,
   "monospace_display": false,
   "image_dir": "./img",
-  "language_dir": "D:\\Anaconda3\\envs\\AccuSim\\lib\\site-packages\\gooey\\languages",
+  "language_dir": "/Users/ftonini/miniconda3/envs/AccuSim/lib/python3.6/site-packages/gooey/languages",
   "progress_regex": null,
   "progress_expr": null,
   "disable_progress_bar_animation": false,
