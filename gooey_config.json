@@ -1,8 +1,8 @@
 {
   "language": "english",
   "target": "\"D:\\Anaconda3\\envs\\AccuSim\\python.exe\" -u \"main.py\"",
-  "program_name": "AccuSim",
-  "program_description": "AccuSim is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool.",
+  "program_name": "Simulation Accuracy & Validation Informatics (SAVI)",
+  "program_description": "SAVI is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool.",
   "sidebar_title": "Actions",
   "default_size": [
     715,
@@ -52,22 +52,25 @@
       "command": "::gooey/default",
       "contents": [
         {
-          "name": "Required Arguments",
+          "name": "Optional Arguments",
           "items": [
             {
-              "id": "Baseline",
+              "id": "-b",
               "type": "FileChooser",
-              "cli_type": "positional",
-              "required": true,
+              "cli_type": "optional",
+              "required": false,
               "data": {
-                "display_name": "Baseline",
+                "display_name": "Baseline Raster",
                 "help": "Select a baseline (e.g. observed) raster file",
-                "required": true,
+                "required": false,
                 "nargs": "",
-                "commands": [],
+                "commands": [
+                  "-b",
+                  "--baseline"
+                ],
                 "choices": [],
                 "default": null,
-                "dest": "Baseline"
+                "dest": "baseline"
               },
               "options": {
                 "error_color": "#ea7878",
@@ -81,19 +84,22 @@
               }
             },
             {
-              "id": "Comparison",
+              "id": "-c",
               "type": "FileChooser",
-              "cli_type": "positional",
-              "required": true,
+              "cli_type": "optional",
+              "required": false,
               "data": {
-                "display_name": "Comparison",
+                "display_name": "Comparison Raster",
                 "help": "Select a comparison (e.g. simulated) raster file",
-                "required": true,
+                "required": false,
                 "nargs": "",
-                "commands": [],
+                "commands": [
+                  "-c",
+                  "--comparison"
+                ],
                 "choices": [],
                 "default": null,
-                "dest": "Comparison"
+                "dest": "comparison"
               },
               "options": {
                 "error_color": "#ea7878",
@@ -107,25 +113,28 @@
               }
             },
             {
-              "id": "Output_Folder",
+              "id": "-f",
               "type": "DirChooser",
-              "cli_type": "positional",
-              "required": true,
+              "cli_type": "optional",
+              "required": false,
               "data": {
-                "display_name": "Output_Folder",
-                "help": "Select a folder where you want to save your output metrics files",
-                "required": true,
+                "display_name": "Output Folder",
+                "help": "Select a local folder to store the summary validation metrics file",
+                "required": false,
                 "nargs": "",
-                "commands": [],
+                "commands": [
+                  "-f",
+                  "--fout"
+                ],
                 "choices": [],
                 "default": null,
-                "dest": "Output_Folder"
+                "dest": "fout"
               },
               "options": {
                 "error_color": "#ea7878",
                 "validator": {
-                  "test": "user_input and not user_input.isspace()",
-                  "message": "This field is required"
+                  "test": "True",
+                  "message": ""
                 },
                 "external_validator": {
                   "cmd": ""
@@ -145,49 +154,22 @@
           "name": "FRAGSTATS (for Windows users ONLY)",
           "items": [
             {
-              "id": "--Calculate metrics",
-              "type": "CheckBox",
-              "cli_type": "optional",
-              "required": false,
-              "data": {
-                "display_name": "Calculate metrics",
-                "help": "Check the box",
-                "required": false,
-                "nargs": "",
-                "commands": [
-                  "--Calculate metrics"
-                ],
-                "choices": [],
-                "default": false,
-                "dest": "Calculate metrics"
-              },
-              "options": {
-                "error_color": "#ea7878",
-                "validator": {
-                  "test": "True",
-                  "message": ""
-                },
-                "external_validator": {
-                  "cmd": ""
-                }
-              }
-            },
-            {
-              "id": "--Executable_File_Location",
+              "id": "-fe",
               "type": "DirChooser",
               "cli_type": "optional",
               "required": false,
               "data": {
-                "display_name": "Executable_File_Location",
-                "help": "Select the folder of the FRAGSTATS executable (.exe) file",
+                "display_name": "FRAGSTATS Executable Folder",
+                "help": "Browse to the local folder containing the FRAGSTATS executable (.exe) file",
                 "required": false,
                 "nargs": "",
                 "commands": [
-                  "--Executable_File_Location"
+                  "-fe",
+                  "--frag_exe"
                 ],
                 "choices": [],
                 "default": null,
-                "dest": "Executable_File_Location"
+                "dest": "frag_exe"
               },
               "options": {
                 "error_color": "#ea7878",

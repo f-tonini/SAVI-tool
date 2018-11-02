@@ -8,16 +8,17 @@ from gooey import Gooey, GooeyParser
 import utils
 
 @Gooey(dump_build_config=True, 
-       program_name="AccuSim", 
+       program_name="Simulation Accuracy & Validation Informatics (SAVI)", 
        image_dir="./img",
        default_size=(715, 550)
        )
 def main():
-    desc = "AccuSim is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool."
+    desc = "SAVI is a convenient, freely-available GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file that accompanies this tool."
     parser = GooeyParser(description=desc)
 
     parser.add_argument(
-        "Baseline", 
+        "-b", "--baseline", 
+        metavar='Baseline Raster',
         help="Select a baseline (e.g. observed) raster file", 
         widget="FileChooser",
         gooey_options={
@@ -28,7 +29,8 @@ def main():
         }
     )
     parser.add_argument(
-        "Comparison", 
+        "-c", "--comparison", 
+        metavar='Comparison Raster',
         help="Select a comparison (e.g. simulated) raster file", 
         widget="FileChooser",
         gooey_options={
@@ -38,7 +40,12 @@ def main():
             }
         }
     )
-    parser.add_argument("Output_Folder", help="Select a folder where you want to save your output metrics files", widget="DirChooser")
+    parser.add_argument(
+        "-f", "--fout",
+        metavar='Output Folder', 
+        help="Select a local folder to store the summary validation metrics file", 
+        widget="DirChooser"
+    )
     
     fragstats_group = parser.add_argument_group(
         "FRAGSTATS (for Windows users ONLY)",
@@ -48,27 +55,38 @@ def main():
         }
     )
 
-    fragstats_group.add_argument(
-        "--Calculate metrics", 
-        default=False,
-        action="store_true",
-        help="Check the box"
-    )
+    # fragstats_group.add_argument(
+    #     "--Calculate metrics", 
+    #     default=False,
+    #     action="store_true",
+    #     help="Check the box"
+    # )
     
     fragstats_group.add_argument(
-        "--Executable_File_Location",
+        "-fe", "--frag_exe",
+        metavar='FRAGSTATS Executable Folder',
         widget="DirChooser",
-        help="Select the folder of the FRAGSTATS executable (.exe) file"
+        help="Browse to the local folder containing the FRAGSTATS executable (.exe) file"
     )
 
+    # fragstats_group_radio = fragstats_group.add_mutually_exclusive_group()
+
+    # fragstats_group_radio.add_argument(
+    #     "-fc", "--frag_check",
+    #     action="store_true",
+    #     metavar='Calculate FRAGSTATS Metrics',
+    #     widget="DirChooser",
+    #     help="Browse to the local folder containing the FRAGSTATS executable (.exe) file"
+    # )
+
     args = parser.parse_args()
-    #display_message()
 
     #Read params from the GUI
-    base_raster_path = args.Baseline
-    comp_raster_path = args.Comparison
-    out_dir = args.Output_Folder
-    exe_location = args.Executable_File_Location
+    base_raster_path = args.baseline
+    comp_raster_path = args.comparison
+    out_dir = args.fout
+    #exe_location = args.frag_check
+    exe_location = args.frag_exe
 
     # open raster data
     with rio.open(base_raster_path) as base:
@@ -102,10 +120,10 @@ def main():
     print(f"{ov_acc:9.2f} {csi:17.2f} {kappa:12.2f} {kappaW:16.2f}")
 
     # Save to output file
-    print("Saving Output Table to File...")
+    print("\nSaving Validation Metrics Table to File...")
     pontius_df = pd.DataFrame(val_lst)
     pontius_df.columns = ["Label", "Omission(%)", "Commission(%)", "Quantity", "Allocation"]
-    out_file = os.path.join(out_dir, "AccuSim_metrics.csv")
+    out_file = os.path.join(out_dir, "SAVI_metrics.csv")
     pontius_df.to_csv(out_file, index=False)
     with open(out_file, 'a') as csvFile:
         writer = csv.writer(csvFile)
@@ -118,23 +136,23 @@ def main():
 
     #FRAGSTATS SECTION
     #-----------------------------------------
+    if exe_location:
+        #TRY THIS %LocalAppData%
+        temp_dir = os.path.join(os.getenv('LOCALAPPDATA'), 'tmpSAVI')
+        if not os.path.exists(temp_dir):
+            try:
+                os.makedirs(temp_dir)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
 
-    #TRY THIS %LocalAppData%
-    temp_dir = os.path.join(os.getenv('LOCALAPPDATA'), 'tmpAccuSim')
-    if not os.path.exists(temp_dir):
-        try:
-            os.makedirs(temp_dir)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+        # Write required .fbt batchfile needed by FRAGSTATS 
+        utils.write_fbt_fragstats(dir_name = temp_dir, baseline = base_raster_path, comparison = comp_raster_path)
 
-    # Write required .fbt batchfile needed by FRAGSTATS 
-    utils.write_fbt_fragstats(dir_name = temp_dir, baseline = base_raster_path, comparison = comp_raster_path)
-
-    # Run FRAGSTATS
-    utils.run_fragstats(dir_name = temp_dir, fbt = "fragbatchinput.fbt", exe_path = exe_location,
-                        baseline = base_raster_path, comparison = comp_raster_path, 
-                        nclasses = n_classes, fout = out_file)
+        # Run FRAGSTATS
+        utils.run_fragstats(dir_name = temp_dir, fbt = "fragbatchinput.fbt", exe_path = exe_location,
+                            baseline = base_raster_path, comparison = comp_raster_path, 
+                            nclasses = n_classes, fout = out_file)
 
 if __name__ == '__main__':
     main()

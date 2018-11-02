@@ -1,4 +1,4 @@
-import os, shutil, errno
+import os, shutil, errno, csv
 import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix
@@ -208,7 +208,7 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses, fout)
     outro.columns = ["Label", "NP", "GYRATE", "FRAC", "CORE", "ENN_AM", "ENN_CV", "ECON", "SUM", "Omit"]
 
     def calculate_Cdif(row):
-        return row['SUM'] / row['Omit']
+        return (row['SUM'] / row['Omit']) * 100
 
     outro['Config Dif'] = outro.apply(calculate_Cdif, axis = 1)
     
@@ -218,8 +218,10 @@ def run_fragstats(dir_name, fbt, exe_path, baseline, comparison, nclasses, fout)
     print(outro.to_string(index = False))
 
     # Save to output file
-    print("Saving Output Table to File...")
+    print("\nSaving Validation Metrics Table to File...")
     with open(fout, 'a') as csvFile:
+        writer = csv.writer(csvFile)
+        writer.writerow('\nFRAGSTATS CONFIGURATION METRICS')
         outro.to_csv(csvFile, index = False)
     csvFile.close()
     
