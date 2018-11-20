@@ -60,8 +60,8 @@ Section "!${PRODUCT_NAME}" sec_app
 
       ; Install files
     SetOutPath "$INSTDIR"
-      File "SAVI_Tool.launch.pyw"
       File "program_icon.ico"
+      File "SAVI_Tool.launch.py"
       File "LICENSE"
   
   ; Install directories
@@ -121,8 +121,8 @@ Section "!${PRODUCT_NAME}" sec_app
   ; Install shortcuts
   ; The output path becomes the working directory for shortcuts
   SetOutPath "%HOMEDRIVE%\%HOMEPATH%"
-    CreateShortCut "$SMPROGRAMS\SAVI Tool.lnk" "$INSTDIR\Python\pythonw.exe" \
-      '"$INSTDIR\SAVI_Tool.launch.pyw"' "$INSTDIR\program_icon.ico"
+    CreateShortCut "$SMPROGRAMS\SAVI Tool.lnk" "$INSTDIR\Python\python.exe" \
+      '"$INSTDIR\SAVI_Tool.launch.py"' "$INSTDIR\program_icon.ico"
   SetOutPath "$INSTDIR"
 
   
@@ -168,8 +168,8 @@ Section "Uninstall"
   ; Remove ourselves from %PATH%
 
   ; Uninstall files
-    Delete "$INSTDIR\SAVI_Tool.launch.pyw"
     Delete "$INSTDIR\program_icon.ico"
+    Delete "$INSTDIR\SAVI_Tool.launch.py"
     Delete "$INSTDIR\LICENSE"
   ; Uninstall directories
     RMDir /r "$INSTDIR\Python"
