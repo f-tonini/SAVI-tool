@@ -1,0 +1,10 @@
+affine/__init__.py,sha256=5_RhnHU75VIxfw-Wk9SfGMpH_oV-a3B0oSuawWnsJ60,19254
+affine/tests/__init__.py,sha256=6EO8EXNeyLHqEBQ3dU43rg4_SJmwz6dICHtl_uuPE7I,27
+affine/tests/test_pickle.py,sha256=m8sf2s7rvoJRKA7SujlOascP-9MO-_FYadx-ZBK4i3M,744
+affine/tests/test_rotation.py,sha256=qZLQsc9V5AHRBjtd_rbzOQcBjMdvg9Eo6UgLvAGTNe4,1321
+affine/tests/test_transform.py,sha256=dn0GAIsdI93CSYa2LwyMa4AZwHKsV9RK72GFSc78pWc,18563
+affine-2.2.1.dist-info/METADATA,sha256=CAKI67Ki9yE02XveC2P8Bz2Y7kveAHa54dsXoWXoe6I,3506
+affine-2.2.1.dist-info/RECORD,,
+affine-2.2.1.dist-info/WHEEL,sha256=gduuPyBvFJQSQ0zdyxF7k0zynDXbIbvg5ZBHoXum5uk,110
+affine-2.2.1.dist-info/top_level.txt,sha256=iQzy0aeBb-rrq5QvrICb3iCkyyxyhP5DWyYEicmmNDQ,7
+affine-2.2.1.dist-info/zip-safe,sha256=AbpHGcgLb-kRsJGnwFEktk7uzpZOCcBY74-YBdrKVGs,1

@@ -1,0 +1,197 @@
+{
+  "language": "english",
+  "target": "\"D:\\Anaconda3\\envs\\AccuSim\\python.exe\" -u \"main.py\"",
+  "program_name": "Simulation Accuracy and Validation Informatics (SAVI)",
+  "program_description": "SAVI is a freely-available, GUI-based tool designed to facilitate and automate the validation of\nsimulated land-change models. Fore more information, see the README file.",
+  "sidebar_title": "Actions",
+  "default_size": [
+    715,
+    550
+  ],
+  "auto_start": false,
+  "show_advanced": true,
+  "run_validators": true,
+  "encoding": "utf-8",
+  "show_stop_warning": true,
+  "show_success_modal": true,
+  "force_stop_is_error": true,
+  "poll_external_updates": false,
+  "return_to_config": false,
+  "use_legacy_titles": true,
+  "num_required_cols": 2,
+  "num_optional_cols": 2,
+  "manual_start": false,
+  "monospace_display": false,
+  "image_dir": "../img",
+  "language_dir": "D:\\Anaconda3\\envs\\AccuSim\\lib\\site-packages\\gooey\\languages",
+  "progress_regex": null,
+  "progress_expr": null,
+  "disable_progress_bar_animation": false,
+  "disable_stop_button": false,
+  "navigation": "SIDEBAR",
+  "show_sidebar": false,
+  "tabbed_groups": false,
+  "group_by_type": true,
+  "body_bg_color": "#f0f0f0",
+  "header_bg_color": "#ffffff",
+  "header_height": 80,
+  "header_show_title": true,
+  "header_show_subtitle": true,
+  "header_image_center": false,
+  "footer_bg_color": "#f0f0f0",
+  "sidebar_bg_color": "#f2f2f2",
+  "terminal_panel_color": "#F0F0F0",
+  "terminal_font_color": "#000000",
+  "terminal_font_family": null,
+  "terminal_font_weight": null,
+  "terminal_font_size": null,
+  "error_color": "#ea7878",
+  "layout": "standard",
+  "widgets": {
+    "main.py": {
+      "command": "::gooey/default",
+      "contents": [
+        {
+          "name": "Optional Arguments",
+          "items": [
+            {
+              "id": "-b",
+              "type": "FileChooser",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "Baseline Raster",
+                "help": "Select a baseline (e.g. observed) raster file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-b",
+                  "--baseline"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "baseline"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "validator": {
+                  "test": "user_input.split(\".\")[1] not in [\".tif\", \".img\"]",
+                  "message": "The raster file extension must be .tif or .img"
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-c",
+              "type": "FileChooser",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "Comparison Raster",
+                "help": "Select a comparison (e.g. simulated) raster file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-c",
+                  "--comparison"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "comparison"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "validator": {
+                  "test": "user_input.split(\".\")[1] not in [\".tif\", \".img\"]",
+                  "message": "The raster file extension must be .tif or .img"
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-f",
+              "type": "DirChooser",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "Output Folder",
+                "help": "Select a local folder to store the summary validation metrics file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-f",
+                  "--fout"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "fout"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            }
+          ],
+          "groups": [],
+          "description": null,
+          "options": {
+            "columns": 2,
+            "padding": 10,
+            "show_border": false
+          }
+        },
+        {
+          "name": "FRAGSTATS (for Windows users ONLY)",
+          "items": [
+            {
+              "id": "-fe",
+              "type": "DirChooser",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "FRAGSTATS Executable Folder",
+                "help": "Browse to the local folder containing the FRAGSTATS executable (.exe) file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-fe",
+                  "--frag_exe"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "frag_exe"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            }
+          ],
+          "groups": [],
+          "description": null,
+          "options": {
+            "columns": 2,
+            "padding": 10,
+            "show_border": false
+          }
+        }
+      ]
+    }
+  }
+}

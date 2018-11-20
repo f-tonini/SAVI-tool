@@ -1,0 +1,70 @@
+Authors
+-------
+
+* Sean Gillies
+* Matthew Perry
+* Kevin Wurster
+* Brendan Ward
+* Jonas Sølvsteen
+* Colin Talbert
+* James McBride
+* Erik Seglem
+* Vincent Sarago
+* Seth Fitzsimmons
+* James Hiebert
+* Amit Kapadia
+* Damon Burgett
+* Even Rouault
+* Kelsey Jordahl
+* Maxim Dubinin
+* Ryan Grout
+* Joshua Arnott
+* AsgerPetersen
+* Mike Toews
+* Nick Grue
+* Alessandro Amici
+* Bas Couwenberg
+* Frédéric Bonifas
+* Ben Lewis
+* Johan Van
+* Chris Holdgraf
+* morrme
+* Chris Holden
+* cgohlke
+* Andrew Catellier
+* mwtoews
+* Martin Kaesberger
+* ngrue
+* Nat Wilson
+* Juan Luis Cano
+* Gregory Raevski
+* Tyler Erickson
+* Jeffrey Gerard
+* Jacques Tardie
+* Robin Wilson
+* Jonas
+* asmith26
+* Aldo Culquicondor
+* Alexander Ivanov
+* Ariel Zerahia
+* Charlie Loyd
+* Damien Ayers
+* Dan Baston
+* Etienne B.
+* Filipe
+* Guy Doulberg
+* James Seppi
+* Jeremy Hooke
+* Jesse Crocker
+* Joris Van
+* Kirill Kouzoubov
+* Martijn Visser
+* Matt Savoie
+* Patrick Young
+* Pratik Yadav
+* Sam Murphy
+* Talbert
+* Trevor R.H.
+* Vincent Schut
+* Alan D.
+* grovduck

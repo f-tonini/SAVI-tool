@@ -1,4 +1,4 @@
-name: AccuSim
+name: SAVI
 channels:
   - defaults
   - conda-forge

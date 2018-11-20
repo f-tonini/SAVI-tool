@@ -24,15 +24,26 @@ The SAVI tool requires two input raster files: (1) a **baseline** raster map, an
 
 Land cover classes should use integer values beginning with 0. For example, if you have a three class map consisting of *urban*, *undeveloped*, and *forest*, then for both maps the urban class should have value 0, undeveloped class have value 1, and the forest class have value 2. The order of values assigned to each class does not matter, as long as they are consistent between the baseline and comparison maps.
 
+### Installing SAVI (for Windows users)
+
+Find the `SAVI_Tool_1.0a.exe` file inside the *install/nsis* folder. Double-click on it and follow the setup to install the SAVI Tool to your computer.
+
+<img src="img/SAVI_install1.png" height="500">
+
+During the installation, you should see a progress bar similar to the image below, where all necessary libraries and python binaries are installed.
+
+<img src="img/SAVI_install2.png" height="500">
+
+Once the setup is complete, launch the SAVI Tool application from the Windows Start menu.
+
 ### Running SAVI
 
 <img src="img/SAVI_gui.png" height="500">
 
-1. Double click on the file `…/SAVI-Tool.exe`. At this point, the tool GUI should pop up on your machine.
-2. Select a baseline (e.g. observed) raster map by clicking on the appropriate `Browse` button. Make sure the raster map has either a `.tif` or `.img` extension. 
-3. Select a comparison (e.g. simulated) raster map by clicking on the appropriate `Browse` button. Make sure the raster map has either a `.tif` or `.img` extension.
-4. Select an output folder location by clicking on the `Browse` button. Any output file will be saved in this location.
-5. **WINDOWS ONLY**: if you wish to calculate configuration metrics, click on the `Browse` button and select the folder location where FRAGSTATS was installed on your machine. For example, under `Program Files (x86)\Fragstats 4`.
+1. Select a baseline (e.g. observed) raster map by clicking on the appropriate `Browse` button. Make sure the raster map has either a `.tif` or `.img` extension. 
+2. Select a comparison (e.g. simulated) raster map by clicking on the appropriate `Browse` button. Make sure the raster map has either a `.tif` or `.img` extension.
+3. Select an output folder location by clicking on the `Browse` button. Any output file will be saved in this location.
+4. **WINDOWS ONLY**: if you wish to calculate configuration metrics, click on the `Browse` button and select the folder location where FRAGSTATS was installed on your machine. For example, under `Program Files (x86)\Fragstats 4`.
 5. Click on the `Start` button to execute the SAVI tool. 
 
 **NOTE: execution time heavily depends on the size and resolution of your input raster maps. If the tool does not complete execution within a reasonable time, try subsetting your input data.** 
@@ -42,6 +53,10 @@ Land cover classes should use integer values beginning with 0. For example, if y
 The output metrics table (`.csv`) is saved into the specified output folder. Open the file to see a summary of all the accuracy metrics computed by the SAVI tool.
 
 <img src="img/SAVI_gui3.png" height="50">
+
+## Sample Data
+
+If you would like to test the SAVI Tool using a set of sample data, you can find a *sample_data* folder inside the installation directory on your computer. Provide the appropriate raster files from the sample data folder to the GUI as explained above and test our tool. 
 
 ## Version
 
