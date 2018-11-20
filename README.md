@@ -28,11 +28,11 @@ Land cover classes should use integer values beginning with 0. For example, if y
 
 Find the `SAVI_Tool_1.0a.exe` file inside the *install/nsis* folder. Double-click on it and follow the setup to install the SAVI Tool to your computer.
 
-<img src="img/SAVI_install1.png" height="500">
+<img src="img/SAVI_install1.png" height="300">
 
 During the installation, you should see a progress bar similar to the image below, where all necessary libraries and python binaries are installed.
 
-<img src="img/SAVI_install2.png" height="500">
+<img src="img/SAVI_install2.png" height="300">
 
 Once the setup is complete, launch the SAVI Tool application from the Windows Start menu.
 
