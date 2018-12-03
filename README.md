@@ -60,7 +60,7 @@ If you would like to test the SAVI Tool using a set of sample data, you can find
 
 ## Version
 
-The current release of the SAVI Tool is **v1.0a** (alpha stage).
+The current release of the SAVI Tool is **v1.1a** (alpha stage).
 
 ## Credits and Contacts
 
