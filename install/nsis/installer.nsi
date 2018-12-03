@@ -1,10 +1,10 @@
 !define PRODUCT_NAME "SAVI Tool"
-!define PRODUCT_VERSION "1.0a"
+!define PRODUCT_VERSION "1.1a"
 !define PY_VERSION "3.6.6"
 !define PY_MAJOR_VERSION "3.6"
 !define BITNESS "64"
 !define ARCH_TAG ".amd64"
-!define INSTALLER_NAME "SAVI_Tool_1.0a.exe"
+!define INSTALLER_NAME "SAVI_Tool_1.1a.exe"
 !define PRODUCT_ICON "program_icon.ico"
 
 ; Marker file to tell the uninstaller that it's a user installation
@@ -60,8 +60,8 @@ Section "!${PRODUCT_NAME}" sec_app
 
       ; Install files
     SetOutPath "$INSTDIR"
-      File "program_icon.ico"
       File "SAVI_Tool.launch.py"
+      File "program_icon.ico"
       File "LICENSE"
   
   ; Install directories
@@ -168,8 +168,8 @@ Section "Uninstall"
   ; Remove ourselves from %PATH%
 
   ; Uninstall files
-    Delete "$INSTDIR\program_icon.ico"
     Delete "$INSTDIR\SAVI_Tool.launch.py"
+    Delete "$INSTDIR\program_icon.ico"
     Delete "$INSTDIR\LICENSE"
   ; Uninstall directories
     RMDir /r "$INSTDIR\Python"
